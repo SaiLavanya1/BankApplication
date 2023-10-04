@@ -1,115 +1,135 @@
 import java.util.Scanner;
 
-public class BankingApplication {
+class BankAccount {
+    private String accountNumber;
+    private String accountHolderName;
+    private String accountType;
+    private long balance;
 
-    public static void main(String[] args) {
-        BankAccount obj1 = new BankAccount("Sai", "A20516764");
-        obj1.showMenu();
-
+    public void openAccount(Scanner scanner) {
+        System.out.print("Enter Account Number: ");
+        accountNumber = scanner.next();
+        System.out.print("Enter Account Type: ");
+        accountType = scanner.next();
+        System.out.print("Enter Account Holder Name: ");
+        accountHolderName = scanner.next();
+        System.out.print("Enter Balance: ");
+        balance = scanner.nextLong();
     }
 
+    public void displayAccountInfo() {
+        System.out.println("Account Holder Name: " + accountHolderName);
+        System.out.println("Account Number: " + accountNumber);
+        System.out.println("Account Type: " + accountType);
+        System.out.println("Balance: " + balance);
+    }
+
+    public void deposit(Scanner scanner) {
+        System.out.print("Enter the amount you want to deposit: ");
+        long amount = scanner.nextLong();
+        balance += amount;
+        System.out.println("Deposit successful. Balance after deposit: " + balance);
+    }
+
+    public void withdraw(Scanner scanner) {
+        System.out.print("Enter the amount you want to withdraw: ");
+        long amount = scanner.nextLong();
+        if (balance >= amount) {
+            balance -= amount;
+            System.out.println("Withdrawal successful. Balance after withdrawal: " + balance);
+        } else {
+            System.out.println("Insufficient balance. Withdrawal failed.");
+        }
+    }
+
+    public boolean search(String accountNo) {
+        return accountNumber.equals(accountNo);
+    }
 }
 
-class BankAccount {
-    int balance;
-    int previousTranscation;
-    String customerName;
-    String customerId;
-
-    public BankAccount(String cname, String cid) {
-        customerName = cname;
-        customerId = cid;
-    }
-
-    void deposit(int amount) {
-        if (amount != 0) {
-            balance = balance + amount;
-            previousTranscation = amount;
-        }
-    }
-
-    void withdraw(int amount) {
-        if (amount != 0) {
-            balance = balance - amount;
-            previousTranscation = -amount;
-        }
-    }
-
-    void getPreviousTranscation() {
-        if (previousTranscation > 0) {
-            System.out.println("Deposited: " + previousTranscation);
-        } else if (previousTranscation < 0) {
-            System.out.println("Withdraw: " + Math.abs(previousTranscation));
-        } else {
-            System.out.println("No Transcation Occured");
-        }
-    }
-
-    void showMenu() {
-        char option = '\0';
+public class BankingApp {
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Welcome " + customerName);
-        System.out.println("Your ID " + customerId);
-        System.out.println("\n");
+        System.out.print("How many customers do you want to input? ");
+        int numberOfCustomers = scanner.nextInt();
+        BankAccount[] accounts = new BankAccount[numberOfCustomers];
 
-        System.out.println("A : Check your Balance");
-        System.out.println("B : Deposit");
-        System.out.println("c : Withdraw");
-        System.out.println("D : Previous Transcation");
-        System.out.println("E : Exit the System");
+        for (int i = 0; i < accounts.length; i++) {
+            accounts[i] = new BankAccount();
+            accounts[i].openAccount(scanner);
+        }
 
+        int choice;
         do {
-            System.out.println("=*=*=*=*=*");
-            System.out.println("Enter your option");
-            System.out.println("=*=*=*=*=*");
-            option = scanner.next().charAt(0);
-            System.out.println("\n");
+            System.out.println("\n*** Banking System Application ***");
+            System.out.println("1. Display all account details");
+            System.out.println("2. Search by Account number");
+            System.out.println("3. Deposit the amount");
+            System.out.println("4. Withdraw the amount");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
 
-            switch (option) {
-                case 'A':
-                    System.out.println("---------------------------------");
-                    System.out.println("Balance = " + balance);
-                    System.out.println("---------------------------------");
-                    System.out.println("\n");
+            switch (choice) {
+                case 1:
+                    for (BankAccount account : accounts) {
+                        account.displayAccountInfo();
+                    }
                     break;
-
-                case 'B':
-                    System.out.println("---------------------------------");
-                    System.out.println("Enter an amount to deposit ");
-                    System.out.println("---------------------------------");
-
-                    int amount = scanner.nextInt();
-                    deposit(amount);
-                    System.out.println("\n");
+                case 2:
+                    System.out.print("Enter account number to search: ");
+                    String accountNo = scanner.next();
+                    boolean found = false;
+                    for (BankAccount account : accounts) {
+                        if (account.search(accountNo)) {
+                            account.displayAccountInfo();
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        System.out.println("Account not found.");
+                    }
                     break;
-
-                case 'C':
-                    System.out.println("---------------------------------");
-                    System.out.println("Enter an amount to withdraw ");
-                    System.out.println("---------------------------------");
-
-                    int amount2 = scanner.nextInt();
-                    withdraw(amount2);
-                    System.out.println("\n");
+                case 3:
+                    System.out.print("Enter account number to deposit: ");
+                    accountNo = scanner.next();
+                    found = false;
+                    for (BankAccount account : accounts) {
+                        if (account.search(accountNo)) {
+                            account.deposit(scanner);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        System.out.println("Account not found.");
+                    }
                     break;
-
-                case 'D':
-                    System.out.println("---------------------------------");
-                    getPreviousTranscation();
-                    System.out.println("---------------------------------");
-                    System.out.println("\n");
+                case 4:
+                    System.out.print("Enter account number to withdraw: ");
+                    accountNo = scanner.next();
+                    found = false;
+                    for (BankAccount account : accounts) {
+                        if (account.search(accountNo)) {
+                            account.withdraw(scanner);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        System.out.println("Account not found.");
+                    }
                     break;
-
-                case 'E':
-                    System.out.println("===================================");
+                case 5:
+                    System.out.println("Exiting the application.");
                     break;
-
                 default:
-                    System.out.println("Invalid Option! Please Enter Correct Option...");
-                    break;
+                    System.out.println("Invalid choice. Please try again.");
             }
-        } while (option != 'E');
-        System.out.println("This is a simple Banking Application");
+        } while (choice != 5);
+
+        scanner.close();
     }
 }
